@@ -18,7 +18,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--output",
-        default="results/benchmark_latest.png",
+        default="results/plots/benchmark_latest.png",
         help="Output PNG path.",
     )
     parser.add_argument(
@@ -29,11 +29,27 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def ensure_results_input_path(path_str: str) -> Path:
+    path = Path(path_str)
+    if path.is_absolute() or "results" in path.parts:
+        return path
+    return Path("results") / path
+
+
+def ensure_plots_output_path(path_str: str) -> Path:
+    path = Path(path_str)
+    if path.is_absolute():
+        return path
+    if "results" in path.parts:
+        return path
+    return Path("results/plots") / path
+
+
 def main() -> int:
     args = parse_args()
 
-    in_path = Path(args.input)
-    out_path = Path(args.output)
+    in_path = ensure_results_input_path(args.input)
+    out_path = ensure_plots_output_path(args.output)
 
     if not in_path.exists():
         print(f"Input CSV not found: {in_path}", file=sys.stderr)

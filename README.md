@@ -1,83 +1,106 @@
 # ai-benchmark-m1
 
-Local LLM inference + benchmarking + plotting on Apple Silicon using `mlx` and `mlx-lm`.
+Benchmark local LLM inference on Apple Silicon with reproducible, lightweight workflows.
 
-## Project layout
+This repository demonstrates practical AI performance evaluation skills relevant to an Entry-Level AI Solutions Architect / Field Applications Engineer role: environment setup, repeatable benchmarking, clean artifact management, and result visualization.
+
+## Overview
+
+- Purpose: measure latency and estimated throughput for local `mlx-lm` generation workloads.
+- Platform focus: macOS on Apple Silicon (M1/M2/M3).
+- Design goal: fast feedback loops using small defaults so the project is safe to run on a laptop.
+
+## Repo Structure
 
 ```text
 ai-benchmark-m1/
+  Makefile
   README.md
+  LICENSE
   requirements.txt
-  .gitignore
   src/
-    run_model.py
-    benchmark.py
-    plot_results.py
+    run_model.py        # Single inference run
+    benchmark.py        # Multi-run benchmark -> CSV
+    plot_results.py     # CSV -> PNG plot
   results/
     .gitkeep
+    plots/
 ```
 
-## Prerequisites
+## Quickstart
 
-- macOS on Apple Silicon (M1/M2/M3)
-- Python 3.10+
-
-## Setup (venv workflow)
+### 1) Setup
 
 ```bash
-cd ai-benchmark-m1
-python3 -m venv .venv
+make setup
 source .venv/bin/activate
-python -m pip install --upgrade pip
-pip install -r requirements.txt
 ```
 
-## Quick smoke tests (small prompt)
-
-Use a small quantized model and low token counts to keep runs short.
+### 2) Smoke Check (No heavy model run)
 
 ```bash
-# Module form
+make smoke
+```
+
+This validates CLI entry points and plotting pipeline with a tiny synthetic CSV.
+
+### 3) Run a Lightweight Benchmark
+
+```bash
+make bench
+```
+
+### 4) Plot Benchmark Output
+
+```bash
+make plot
+```
+
+## Methodology
+
+1. Load an `mlx-lm` compatible model.
+2. Execute N repeated generations with fixed prompt and token settings.
+3. Record per-run latency and estimated tokens/sec.
+4. Save benchmark artifacts as CSV under `results/`.
+5. Generate plots under `results/plots/` for quick trend inspection.
+
+Current default model is intentionally small and quantized:
+`mlx-community/Qwen2.5-0.5B-Instruct-4bit`.
+
+## Results (Placeholder)
+
+Use this section for recruiter-facing evidence once you run local benchmarks.
+
+| Date | Hardware | Model | Runs | Avg Latency (s) | Avg Tok/s | Artifacts |
+|---|---|---|---:|---:|---:|---|
+| _TBD_ | _TBD_ | _TBD_ | _TBD_ | _TBD_ | _TBD_ | `results/benchmark_latest.csv`, `results/plots/benchmark_latest.png` |
+
+## Reproducibility Notes
+
+- Pin Python dependencies via `requirements.txt`.
+- Keep benchmark settings explicit (`--runs`, `--max-tokens`, `--temperature`).
+- Commit only code and lightweight placeholders, not generated benchmark artifacts.
+
+## Troubleshooting
+
+- `ModuleNotFoundError: mlx_lm`
+  - Run `make setup`, then ensure virtualenv is activated.
+- First benchmark run is slow
+  - Initial model download/loading is expected and included in reported `load_seconds`.
+- Plot command fails due to missing CSV
+  - Run `make bench` first or provide `--input` pointing to an existing file under `results/`.
+
+## Next Steps
+
+- Add multi-model comparison runs and aggregate dashboards.
+- Add CPU/GPU memory telemetry for deeper performance profiling.
+- Add CI checks for `make smoke` on pull requests.
+- Export Markdown summary reports from benchmark CSVs.
+
+## Direct CLI Usage
+
+```bash
 python -m src.run_model --help
 python -m src.benchmark --help
 python -m src.plot_results --help
-
-# Script form
-python src/run_model.py --help
-python src/benchmark.py --help
-python src/plot_results.py --help
 ```
-
-Optional real inference smoke test (downloads model if not cached):
-
-```bash
-python -m src.run_model \
-  --model mlx-community/Qwen2.5-0.5B-Instruct-4bit \
-  --prompt "Say hello in one sentence." \
-  --max-tokens 24
-```
-
-## Benchmark example
-
-```bash
-python -m src.benchmark \
-  --model mlx-community/Qwen2.5-0.5B-Instruct-4bit \
-  --prompt "Explain overfitting in one sentence." \
-  --runs 3 \
-  --max-tokens 32 \
-  --output results/benchmark_latest.csv
-```
-
-## Plot example
-
-```bash
-python -m src.plot_results \
-  --input results/benchmark_latest.csv \
-  --output results/benchmark_latest.png
-```
-
-## Notes
-
-- `mlx-lm` handles model loading and generation.
-- First run can be slower due to model download/loading.
-- Keep prompts and `--max-tokens` small for smoke checks.

@@ -1,19 +1,48 @@
-# Python
+# Python bytecode and tooling
 __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
+*.so
+*.dylib
+.Python
 .pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Build/distribution
+build/
+dist/
+*.egg-info/
+.eggs/
 
 # Virtual environments
 .venv/
 venv/
+env/
+ENV/
+
+# IDE/editor
+.vscode/
+.idea/
+*.swp
 
 # macOS
 .DS_Store
+.AppleDouble
+.LSOverride
 
-# Results artifacts
+# Benchmark/result artifacts
 results/*.csv
-results/*.png
 results/*.json
+results/*.txt
+results/*.log
+results/plots/*.png
+results/plots/*.svg
+results/plots/*.pdf
+
+# Keep placeholder directories tracked
 !results/.gitkeep
